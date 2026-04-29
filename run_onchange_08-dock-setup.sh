@@ -1,11 +1,19 @@
 #!/bin/bash
 set -e
 
+section() { echo; echo "==> $1"; }
+ok()      { echo "    [done] $1"; }
+info()    { echo "    --> $1"; }
+
+section "Dock Configuration"
+
 if ! command -v dockutil &>/dev/null; then
+    info "dockutil not found, installing via brew..."
     brew install dockutil
+    ok "dockutil installed."
 fi
 
-echo "Configuring Dock..."
+info "Clearing existing Dock items..."
 
 dockutil --remove all --no-restart
 
@@ -24,5 +32,6 @@ dockutil --add /Applications/iTerm.app                                        --
 # ── Right side: Applications folder as a stack ────────────────────────────────
 dockutil --add /Applications --view grid --display folder --sort name         --no-restart
 
+info "Restarting Dock..."
 killall Dock
-echo "Dock configured."
+ok "Dock configured."

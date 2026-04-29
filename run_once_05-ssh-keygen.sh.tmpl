@@ -1,9 +1,17 @@
 #!/bin/bash
 set -e
 
+section() { echo; echo "==> $1"; }
+ok()      { echo "    [done] $1"; }
+skip()    { echo "    [skip] $1"; }
+info()    { echo "    --> $1"; }
+
+section "SSH Key Generation"
+
 SSH_DIR="$HOME/.ssh"
 mkdir -p "$SSH_DIR"
 chmod 700 "$SSH_DIR"
+info "SSH directory: $SSH_DIR"
 
 generate_key() {
     local name="$1"
@@ -11,16 +19,17 @@ generate_key() {
     local keyfile="$SSH_DIR/id_ed25519_${name}"
 
     if [[ -f "$keyfile" ]]; then
-        echo "SSH key for ${name} already exists, skipping."
+        skip "Key for ${name} already exists: ${keyfile}"
         return
     fi
 
-    echo "Generating SSH key for ${name} (${email})..."
+    info "Generating ed25519 key for ${name} (${email})..."
     ssh-keygen -t ed25519 -C "$email" -f "$keyfile" -N ""
-    echo ""
-    echo "=== Public key for ${name} — add this to GitHub/GitLab ==="
-    cat "${keyfile}.pub"
-    echo ""
+    ok "Key generated: $keyfile"
+    echo
+    echo "    Public key for ${name} — add this to GitHub/GitLab:"
+    echo "    $(cat "${keyfile}.pub")"
+    echo
 }
 
 generate_key "private" "{{ .email_private }}"

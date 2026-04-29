@@ -1,33 +1,118 @@
 # dotfiles
 
-Dotfiles and macOS setup managed with [chezmoi](https://chezmoi.io).
+macOS dotfiles managed with [chezmoi](https://chezmoi.io) and [age](https://age-encryption.org) encryption.
 
-## Bootstrap a new Mac (one command)
+---
 
-```sh
-sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply yegli
-```
+## Setting up a new Mac
 
-chezmoi looks for `<github-user>/dotfiles` by default, so the short form works.  
-It installs chezmoi, clones this repo, prompts for your emails, and applies everything.  
-The `run_once_` scripts then handle the rest automatically.
+### Step 1 — Restore your age key (do this first)
 
-> **Before running on a new Mac:** restore `~/.config/chezmoi/key.txt` from Proton Pass first
-> so chezmoi can decrypt encrypted files.
+The age key decrypts secrets stored in this repo. Without it, chezmoi will error.
+
+Retrieve `key.txt` from Proton Pass, then:
 
 ```sh
 mkdir -p ~/.config/chezmoi
-# paste key.txt content from Proton Pass, then:
+nano ~/.config/chezmoi/key.txt   # paste the key contents, save
+```
+
+### Step 2 — Run the bootstrap one-liner
+
+```sh
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply yegli
 ```
 
-## Why public repo + age encryption?
+This installs chezmoi (no Homebrew needed), clones this repo, prompts for your three email addresses, then applies everything. The scripts run automatically in order:
 
-The repo is public so the one-liner bootstrap works without pre-configuring SSH or tokens.
-Sensitive files (SSH keys, secrets) are encrypted with [age](https://age-encryption.org) before
-being committed — the ciphertext is useless without your private key, which never touches the repo.
+| Script | What it does | Notes |
+|--------|-------------|-------|
+| `run_once_01` | Install Homebrew | Will prompt for sudo |
+| `run_onchange_02` | `brew bundle` — all CLI tools, casks, VS Code extensions | App Store apps need Step 3 first |
+| `run_once_03` | Install oh-my-zsh + plugins | |
+| `run_once_04` | Create `~/_code/{private,ost,work}` | |
+| `run_once_05` | Generate SSH keys, write `~/.ssh/config` | Prints public keys — see Step 4 |
+| `run_once_06` | Install VS Code extensions (fallback list) | Skips if `code` CLI not in PATH yet |
+| `run_once_07` | Import GPG keys from encrypted repo | Requires age key from Step 1 |
+| `run_onchange_08` | Configure Dock | |
+| `run_once_09` | Download and install MacTeX (~4 GB) | Long download — grab a coffee |
 
-## First-time age setup (do this once on your current Mac)
+### Step 3 — App Store apps (if needed)
+
+The App Store section in the Brewfile is currently commented out. If you uncomment `mas` lines:
+
+1. Sign into the App Store manually
+2. Run `make brew-install` to retry
+
+### Step 4 — Add SSH keys to your accounts
+
+After Step 2 finishes, the terminal will have printed three public keys. Add them:
+
+- `~/.ssh/id_ed25519_private.pub` → [github.com](https://github.com) (personal account)
+- `~/.ssh/id_ed25519_ost.pub` → OST GitLab
+- `~/.ssh/id_ed25519_work.pub` → work GitHub / GitLab
+
+```sh
+# Print any key again if you missed it
+cat ~/.ssh/id_ed25519_private.pub
+```
+
+### Step 5 — Set GPG key trust (if using GPG)
+
+If `run_once_07` imported your GPG keys, set ultimate trust:
+
+```sh
+gpg --edit-key BF2588A3D74BD253D35745679CCA22896ED60D92
+# type: trust → 5 → y → save
+```
+
+### Step 6 — VS Code CLI (if extensions were skipped)
+
+If `code` was not in PATH during bootstrap, install extensions now:
+
+1. Open VS Code
+2. Open the command palette (`Cmd+Shift+P`) → **Shell Command: Install 'code' command in PATH**
+3. Run `make vscode-extensions`
+
+---
+
+## Git context routing
+
+Repos under `~/_code/<context>/` automatically use the right identity and SSH key:
+
+```
+~/_code/private/  →  ~/.gitconfig-private  →  git@github-private:...
+~/_code/ost/      →  ~/.gitconfig-ost      →  git@github-ost:...
+~/_code/work/     →  ~/.gitconfig-work     →  git@github-work:...
+```
+
+Use the SSH host aliases when cloning:
+
+```sh
+# personal repo
+git clone git@github-private:yegli/repo.git
+
+# instead of the plain
+git clone git@github.com:yegli/repo.git
+```
+
+---
+
+## Day-to-day workflow
+
+```sh
+chezmoi edit ~/.zshrc          # edit a tracked file (auto-commits + pushes)
+make add file=~/.zshrc         # start tracking a new plaintext file
+make add-encrypted file=~/.foo # start tracking a new secret file
+make update                    # pull latest on another machine and apply
+make diff                      # preview pending changes before applying
+```
+
+---
+
+## First-time setup on a new Mac (age key not yet created)
+
+Only needed if you're starting fresh and have no `key.txt` yet.
 
 ```sh
 make age-init
@@ -36,110 +121,39 @@ make age-init
 This generates `~/.config/chezmoi/key.txt` and prints your public key.
 
 1. Copy the public key into `.chezmoi.toml.tmpl` → `recipient = "age1..."`
-2. Save the **entire `key.txt`** to Proton Pass (this is your decryption key)
-3. Commit and push the updated `.chezmoi.toml.tmpl`
+2. Save the entire `key.txt` to Proton Pass
+3. Commit and push `.chezmoi.toml.tmpl`
 
-To encrypt a file before tracking it:
+---
 
-```sh
-make add-encrypted file=~/.ssh/id_ed25519
-# or directly:
-chezmoi add --encrypt ~/.ssh/id_ed25519
-```
-
-Encrypted files are stored as `encrypted_<name>.age` in the source directory — safe to commit publicly.
-
-## What gets set up automatically
-
-| Script | What it does |
-|---|---|
-| `run_once_01` | Install Homebrew |
-| `run_once_02` | `brew bundle` — all apps from `Brewfile` |
-| `run_once_03` | Install oh-my-zsh + autosuggestions + syntax-highlighting |
-| `run_once_04` | Create `~/_code/{private,ost,work}` |
-| `run_once_05` | Generate SSH keys per context, write `~/.ssh/config` |
-| `run_once_06` | Install VS Code extensions |
-
-## Dotfiles managed
-
-- `~/.zshrc`
-- `~/.gitconfig` (with `includeIf` per code folder)
-- `~/.gitconfig-private` / `~/.gitconfig-ost` / `~/.gitconfig-work`
-
-SSH keys are generated fresh on each new machine (`run_once_05`). After bootstrap, add the printed public keys to the relevant GitHub/GitLab accounts.
-
-## Git context routing
-
-Repos under `~/_code/<context>/` automatically pick up the right email and SSH key:
-
-```
-~/_code/private/  →  ~/.gitconfig-private  →  ~/.ssh/id_ed25519_private
-~/_code/ost/      →  ~/.gitconfig-ost      →  ~/.ssh/id_ed25519_ost
-~/_code/work/     →  ~/.gitconfig-work     →  ~/.ssh/id_ed25519_work
-```
-
-Use the SSH host aliases from `~/.ssh/config` for remote URLs:
+## All Makefile targets
 
 ```sh
-# instead of git@github.com:yegli/repo.git
-git clone git@github-private:yegli/repo.git
-```
-
-## Auto-commit
-
-`[git] autoCommit = true / autoPush = true` is set in `.chezmoi.toml.tmpl`.  
-Every `chezmoi add` or `chezmoi edit` automatically commits and pushes to GitHub.
-
-## Manual Makefile targets
-
-```sh
-make help                        # show all targets
+make help                        # print all targets
 
 # Dotfiles
-make apply                       # apply dotfiles
-make update                      # pull + apply
-make diff                        # preview changes
-make status                      # show what changed
+make apply                       # apply dotfiles now
+make update                      # pull from GitHub + apply
+make diff                        # preview pending changes
+make status                      # show tracked files with changes
 make add file=~/.zshrc           # track a plaintext file
 make add-encrypted file=~/.foo   # track an age-encrypted file
 make edit file=~/.zshrc          # edit a tracked file
 
-# Encryption
-make age-init                    # generate age key (once, on current Mac)
+# Encryption / GPG
+make age-init                    # generate age key (once per machine)
+make gpg-export                  # export + encrypt GPG keys into gpg-keys/
+make gpg-import                  # decrypt + import GPG keys
 
-# Setup steps (run individually if needed)
+# Individual setup steps (run manually if something failed during bootstrap)
 make install-homebrew
 make brew-install
-make brew-dump                   # overwrite Brewfile from current installs
+make brew-dump                   # overwrite Brewfile from currently installed packages
 make install-ohmyzsh
 make create-folders
 make ssh-keygen-all
 make vscode-extensions
+make mactex-install              # download + install MacTeX (~4 GB)
 
-make setup                       # run everything in order
-```
-
-## App Store apps
-
-Installed via `mas` (included in Brewfile). You must be signed into the App Store first.
-
-- Magnet
-- WhatsApp
-- GoodNotes 5
-- Microsoft Outlook
-
-## Day-to-day workflow
-
-```sh
-# Edit a dotfile — auto-commits and pushes
-chezmoi edit ~/.zshrc
-
-# Track a new plaintext file
-make add file=~/.zshrc
-
-# Track a new secret file (SSH key, token, etc.)
-make add-encrypted file=~/.ssh/id_ed25519
-
-# Pull latest on another machine
-make update
+make setup                       # run all setup steps in order
 ```

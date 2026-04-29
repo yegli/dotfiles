@@ -1,0 +1,19 @@
+#!/bin/bash
+# {{ include "Brewfile" | sha256sum }}
+set -e
+
+section() { echo; echo "==> $1"; }
+ok()      { echo "    [done] $1"; }
+info()    { echo "    --> $1"; }
+
+section "Brew Bundle"
+info "Brewfile: $CHEZMOI_SOURCE_DIR/Brewfile"
+
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+brew bundle --file="$CHEZMOI_SOURCE_DIR/Brewfile" --no-upgrade && ok "All packages installed." || {
+    echo
+    echo "    [warn] brew bundle reported failures."
+    info "App Store apps require signing in to the App Store first."
+    info "Run 'make brew-install' after signing in to retry."
+}

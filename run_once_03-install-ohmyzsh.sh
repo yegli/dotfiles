@@ -1,17 +1,28 @@
 #!/bin/bash
 set -e
 
+section() { echo; echo "==> $1"; }
+ok()      { echo "    [done] $1"; }
+skip()    { echo "    [skip] $1"; }
+info()    { echo "    --> $1"; }
+
+section "oh-my-zsh Installation"
+
 if [[ -d "$HOME/.oh-my-zsh" ]]; then
-    echo "oh-my-zsh already installed, skipping."
+    skip "oh-my-zsh already installed at $HOME/.oh-my-zsh."
     exit 0
 fi
 
-echo "Installing oh-my-zsh..."
+info "Downloading and running oh-my-zsh installer..."
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+ok "oh-my-zsh installed."
 
-# Install popular plugins
-git clone https://github.com/zsh-users/zsh-autosuggestions \
-    "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions"
+CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 
-git clone https://github.com/zsh-users/zsh-syntax-highlighting \
-    "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting"
+info "Installing plugin: zsh-autosuggestions..."
+git clone https://github.com/zsh-users/zsh-autosuggestions "$CUSTOM/plugins/zsh-autosuggestions"
+ok "zsh-autosuggestions installed."
+
+info "Installing plugin: zsh-syntax-highlighting..."
+git clone https://github.com/zsh-users/zsh-syntax-highlighting "$CUSTOM/plugins/zsh-syntax-highlighting"
+ok "zsh-syntax-highlighting installed."

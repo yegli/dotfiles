@@ -2,7 +2,7 @@
         age-init gpg-export gpg-import \
         install-homebrew brew-install brew-dump \
         install-ohmyzsh create-folders ssh-keygen-all \
-        vscode-extensions setup
+        vscode-extensions mactex-install setup
 
 help:
 	@echo "chezmoi"
@@ -27,6 +27,7 @@ help:
 	@echo "  create-folders          create ~/_code/{private,ost,work}"
 	@echo "  ssh-keygen-all          generate SSH keys for all contexts"
 	@echo "  vscode-extensions       install VS Code extensions"
+	@echo "  mactex-install          download and install MacTeX (~4 GB)"
 	@echo ""
 	@echo "  setup                   run all setup steps in order"
 
@@ -113,6 +114,9 @@ ssh-keygen-all:
 
 vscode-extensions:
 	bash run_once_06-vscode-extensions.sh
+
+mactex-install:
+	bash run_once_09-install-mactex.sh
 
 setup: install-homebrew brew-install install-ohmyzsh create-folders ssh-keygen-all vscode-extensions apply
 	@echo "Setup complete."
