@@ -3,6 +3,8 @@
 {{- $emailOst := promptString "Email (OST)" -}}
 {{- $emailWork := promptString "Email (work)" -}}
 
+encryption = "age"
+
 [data]
     name = {{ $name | quote }}
     email_private = {{ $emailPrivate | quote }}

@@ -65,7 +65,8 @@ Encrypted files are stored as `encrypted_<name>.age` in the source directory —
 - `~/.zshrc`
 - `~/.gitconfig` (with `includeIf` per code folder)
 - `~/.gitconfig-private` / `~/.gitconfig-ost` / `~/.gitconfig-work`
-- `~/.ssh/id_ed25519_*` (encrypted)
+
+SSH keys are generated fresh on each new machine (`run_once_05`). After bootstrap, add the printed public keys to the relevant GitHub/GitLab accounts.
 
 ## Git context routing
 

@@ -75,8 +75,8 @@ age-init:
 		echo "  3. Run: git add .chezmoi.toml.tmpl && git commit && git push"; \
 	fi
 
-GPG_KEYS := 792A29606119E2B8365E871B2F861421286ACF01 3B9B04CBA5DC3BD55E5818EC5862E8FC9C066EA4
-AGE_RECIPIENT := $(shell grep "^# public key:" ~/.config/chezmoi/key.txt 2>/dev/null | sed 's/# public key: //')
+GPG_KEYS := BF2588A3D74BD253D35745679CCA22896ED60D92 587B0641516FABE626999338E60586625F142A3E
+AGE_RECIPIENT := $(shell awk '/public key:/{print $$NF}' ~/.config/chezmoi/key.txt 2>/dev/null)
 
 gpg-export:
 	@mkdir -p gpg-keys

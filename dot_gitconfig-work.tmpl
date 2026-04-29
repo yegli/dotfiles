@@ -1,10 +1,5 @@
 [user]
-    name = Yanick Egli
+    name = {{ .name }}
     email = {{ .email_work }}
-    signingkey = 3B9B04CBA5DC3BD55E5818EC5862E8FC9C066EA4
-
-[commit]
-    gpgsign = true
-
 [core]
     sshCommand = ssh -i ~/.ssh/id_ed25519_work

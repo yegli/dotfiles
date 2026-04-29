@@ -1,6 +1,3 @@
-# Taps
-tap "homebrew/bundle"
-
 # CLI tools
 brew "make"
 brew "git"
@@ -18,8 +15,8 @@ cask "google-chrome"
 cask "displaylink"
 cask "claude"
 
-# App Store
-mas "Magnet", id: 441258766
-mas "WhatsApp", id: 310633997
-mas "GoodNotes 5", id: 1444383602
-mas "Microsoft Outlook", id: 985367838
+# # App Store
+# mas "Magnet", id: 441258766
+# mas "WhatsApp", id: 310633997
+# mas "GoodNotes 5", id: 1444383602
+# mas "Microsoft Outlook", id: 985367838
