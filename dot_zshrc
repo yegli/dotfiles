@@ -7,7 +7,6 @@ plugins=(
     z
     macos
     brew
-    vscode
     zsh-autosuggestions
     zsh-syntax-highlighting
 )
