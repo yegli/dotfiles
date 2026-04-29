@@ -30,6 +30,7 @@ brew "yq"
 brew "zsh"
 brew "zsh-autosuggestions"
 brew "derailed/k9s/k9s"
+brew "kubernetes-cli"
 
 # Apps
 cask "iterm2"

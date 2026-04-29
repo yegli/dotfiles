@@ -34,3 +34,4 @@ alias work="cd ~/_code/work"
 
 # Homebrew
 eval "$(/opt/homebrew/bin/brew shellenv)"
+
