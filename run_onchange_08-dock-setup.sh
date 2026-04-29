@@ -16,9 +16,9 @@ dockutil --add /System/Applications/Calendar.app                              --
 dockutil --add /System/Applications/Reminders.app                             --no-restart
 dockutil --add /System/Applications/Photos.app                                --no-restart
 dockutil --add /System/Applications/System\ Settings.app                      --no-restart
-dockutil --add /System/Applications/Visual\ Studio\ Code.app                  --no-restart
-dockutil --add /System/Applications/UTM.app                                   --no-restart
-dockutil --add /System/Applications/iTerm.app                                 --no-restart
+dockutil --add /Applications/Visual\ Studio\ Code.app                         --no-restart
+dockutil --add /Applications/UTM.app                                          --no-restart
+dockutil --add /Applications/iTerm.app                                        --no-restart
 # Add more apps here ↓
 
 # ── Right side: Applications folder as a stack ────────────────────────────────
