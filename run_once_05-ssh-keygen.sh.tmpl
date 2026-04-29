@@ -1,0 +1,57 @@
+#!/bin/bash
+set -e
+
+SSH_DIR="$HOME/.ssh"
+mkdir -p "$SSH_DIR"
+chmod 700 "$SSH_DIR"
+
+generate_key() {
+    local name="$1"
+    local email="$2"
+    local keyfile="$SSH_DIR/id_ed25519_${name}"
+
+    if [[ -f "$keyfile" ]]; then
+        echo "SSH key for ${name} already exists, skipping."
+        return
+    fi
+
+    echo "Generating SSH key for ${name} (${email})..."
+    ssh-keygen -t ed25519 -C "$email" -f "$keyfile" -N ""
+    echo ""
+    echo "=== Public key for ${name} — add this to GitHub/GitLab ==="
+    cat "${keyfile}.pub"
+    echo ""
+}
+
+generate_key "private" "{{ .email_private }}"
+generate_key "ost"     "{{ .email_ost }}"
+generate_key "work"    "{{ .email_work }}"
+
+# Write SSH config
+SSH_CONFIG="$SSH_DIR/config"
+
+if ! grep -q "id_ed25519_private" "$SSH_CONFIG" 2>/dev/null; then
+    cat >> "$SSH_CONFIG" <<'EOF'
+
+# Private
+Host github-private
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_private
+
+# OST
+Host github-ost
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_ost
+
+# Work
+Host github-work
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_work
+EOF
+    chmod 600 "$SSH_CONFIG"
+fi
+
+echo "SSH setup complete. Add the public keys above to their respective accounts before cloning repos."

@@ -1,0 +1,26 @@
+[includeIf "gitdir:~/_code/ost/"]
+    path = ~/.gitconfig-uni
+[includeIf "gitdir:~/_code/work/"]
+    path = ~/.gitconfig-work
+[includeIf "gitdir:~/_code/private/"]
+    path = ~/.gitconfig-private
+
+[core]
+    editor = code --wait
+    autocrlf = input
+
+[push]
+    default = current
+    autoSetupRemote = true
+
+[pull]
+    rebase = false
+
+[init]
+    defaultBranch = main
+
+[alias]
+    st = status
+    co = checkout
+    br = branch
+    lg = log --oneline --graph --decorate --all

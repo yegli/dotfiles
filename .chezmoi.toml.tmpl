@@ -1,0 +1,21 @@
+{{- $name := promptString "Full name" -}}
+{{- $emailPrivate := promptString "Email (private)" -}}
+{{- $emailOst := promptString "Email (OST)" -}}
+{{- $emailWork := promptString "Email (work)" -}}
+
+[data]
+    name = {{ $name | quote }}
+    email_private = {{ $emailPrivate | quote }}
+    email_ost = {{ $emailOst | quote }}
+    email_work = {{ $emailWork | quote }}
+    github_user = "yegli"
+
+# Auto-commit and push on every `chezmoi add` / `chezmoi edit`
+[git]
+    autoCommit = true
+    autoPush = true
+
+# age encryption — private key lives only locally + in Proton Pass, never committed
+[age]
+    identity = "~/.config/chezmoi/key.txt"
+    recipient = "age1207zhgg7t628slx9srrkp9x0l3s4yyptszhkplse34hlrqctjsqqumnq2p"
