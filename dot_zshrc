@@ -26,7 +26,7 @@ alias ...="cd ../.."
 alias gs="git status"
 alias gp="git pull"
 alias gpu="git push"
-alias K="kubectl"
+alias k="kubectl"
 
 # Code folders
 alias priv="cd ~/_code/private"
