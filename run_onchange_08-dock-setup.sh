@@ -27,6 +27,8 @@ dockutil --add /System/Applications/System\ Settings.app                      --
 dockutil --add /Applications/Visual\ Studio\ Code.app                         --no-restart
 dockutil --add /Applications/UTM.app                                          --no-restart
 dockutil --add /Applications/iTerm.app                                        --no-restart
+dockutil --add /Applications/Microsoft\ Outlook.app                           --no-restart
+dockutil --add /Applications/Microsoft\ Teams.app                             --no-restart
 # Add more apps here ↓
 
 # ── Right side: Applications folder as a stack ────────────────────────────────
